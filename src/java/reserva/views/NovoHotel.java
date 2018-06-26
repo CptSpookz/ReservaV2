@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reserva.views;
 
 import java.io.Serializable;
@@ -19,14 +14,10 @@ import javax.inject.Named;
 import reserva.beans.Hotel;
 import reserva.dao.HotelDAO;
 
-/**
- *
- * @author spooks
- */
-
 @Named
 @SessionScoped
 public class NovoHotel implements Serializable {
+    
     @Inject HotelDAO hotelDao;
     Hotel dadosHotel;
     Hotel usuarioEncontrado;
@@ -60,39 +51,11 @@ public class NovoHotel implements Serializable {
         return estado;
     }
     
-    public void validarCNPJ (FacesContext context, UIComponent toValidate, String value) {
-        simularDemora();
-        if (value.trim().length() == 0) {
-            ((UIInput) toValidate).setValid(false);
-            FacesMessage message = new FacesMessage("CNPJ não pode ser vazio!");
-            context.addMessage(toValidate.getClientId(context), message);
-        }
-        if (value.length() < 14 || value.length() > 15 ){
-            ((UIInput) toValidate).setValid(false);
-            FacesMessage message = new FacesMessage("CNPJ deve conter 14 dígitos!. Ex: 72629140000134");
-            context.addMessage(toValidate.getClientId(context), message);
-        }
-        if (value.matches("[a-zA-Z]*")) {
-            ((UIInput) toValidate).setValid(false);
-            FacesMessage message = new FacesMessage("CNPJ não deve conter letras!");
-            context.addMessage(toValidate.getClientId(context), message);
-        }
-    }
-    
     public void validarNome (FacesContext context, UIComponent toValidate, String value) {
         simularDemora();
         if (value.trim().length() == 0) {
             ((UIInput) toValidate).setValid(false);
             FacesMessage message = new FacesMessage("Nome não pode ser vazio!");
-            context.addMessage(toValidate.getClientId(context), message);
-        }
-    }
-    
-    public void validarSenha (FacesContext context, UIComponent toValidate, String value) {
-        simularDemora();
-        if (value.trim().length() == 0) {
-            ((UIInput) toValidate).setValid(false);
-            FacesMessage message = new FacesMessage("Senha não pode ser vazia!");
             context.addMessage(toValidate.getClientId(context), message);
         }
     }
@@ -106,18 +69,39 @@ public class NovoHotel implements Serializable {
         }
     }
     
+    public void validarSenha (FacesContext context, UIComponent toValidate, String value) {
+        simularDemora();
+        if (value.trim().length() == 0) {
+            ((UIInput) toValidate).setValid(false);
+            FacesMessage message = new FacesMessage("Senha não pode ser vazia!");
+            context.addMessage(toValidate.getClientId(context), message);
+        }
+    }
+    
     public void procurarCNPJ() {
         simularDemora();
         try {
-            usuarioEncontrado = hotelDao.buscarHotelPorCNPJ(dadosHotel.getCNPJ());
-            if (usuarioEncontrado == null) {
-                mensagem.setMensagem(true, "CNPJ ainda não cadastrado! Informe uma nova senha e demais dados para cadastro.", MensagemBootstrap.TipoMensagem.TIPO_INFO);
-                estado = NovoHotelMaquinaEstados.novoHotel();
-            } else {
-                mensagem.setMensagem(true, "CNPJ já cadastrado! Informe um novo CNPJ para efetuar cadastro.", MensagemBootstrap.TipoMensagem.TIPO_SUCESSO);
+            dadosHotel.setCNPJ(dadosHotel.getCNPJ().replace(".","").replace("/","").replace("-",""));
+            if (dadosHotel.getCNPJ().length() == 0){
+                mensagem.setMensagem(true, "CNPJ Inválido!! CNPJ não pode ser vazio.", MensagemBootstrap.TipoMensagem.TIPO_ERRO);
                 estado = NovoHotelMaquinaEstados.inicio();
+            }else if(dadosHotel.getCNPJ().length() < 14 || dadosHotel.getCNPJ().length() >= 15){
+                mensagem.setMensagem(true, "CNPJ Inválido!! CNPJ deve conter 14 dígitos!. Ex: 72629140000134 .", MensagemBootstrap.TipoMensagem.TIPO_ERRO);
+                estado = NovoHotelMaquinaEstados.inicio();
+            }else if(dadosHotel.getCNPJ().matches("[0-9]*[a-zA-Z]+[0-9]*")){
+                mensagem.setMensagem(true, "CNPJ Inválido!! CNPJ não deve conter letras.", MensagemBootstrap.TipoMensagem.TIPO_ERRO);
+                estado = NovoHotelMaquinaEstados.inicio();
+            }else{
+                usuarioEncontrado = hotelDao.buscarHotelPorCNPJ(dadosHotel.getCNPJ());
+                if (usuarioEncontrado == null) {
+                    mensagem.setMensagem(true, "CNPJ ainda não cadastrado! Informe uma nova senha e demais dados para cadastro.", MensagemBootstrap.TipoMensagem.TIPO_INFO);
+                    estado = NovoHotelMaquinaEstados.novoHotel();
+                } else {
+                    mensagem.setMensagem(true, "CNPJ já cadastrado! Informe um novo CNPJ para efetuar cadastro.", MensagemBootstrap.TipoMensagem.TIPO_SUCESSO);
+                    estado = NovoHotelMaquinaEstados.inicio();
+                }
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | NullPointerException ex) {
             Logger.getLogger(NovoHotel.class.getName()).log(Level.SEVERE, null, ex);
             mensagem.setMensagem(true, "Ocorreu um problema!", MensagemBootstrap.TipoMensagem.TIPO_ERRO);
         }

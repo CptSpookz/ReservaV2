@@ -22,8 +22,11 @@
               <br/>
                <div class="container center">
                 <h:form class="col s6">
+                   <div class="alert #{login.mensagem.tipoMensagem}" jsf:id="mensagem">
+                               #{login.mensagem.texto}
+                   </div>
                    <div class="row">
-                       <h:selectOneRadio value = "#{login.tipo}"> 
+                     <h:selectOneRadio value = "#{login.tipo}"> 
                         <f:selectItem itemValue = "adm" itemLabel = "Administrador" /> 
                         <f:selectItem itemValue = "hotel" itemLabel = "Hotel" />
                         <f:selectItem itemValue = "site" itemLabel = "Site" />
@@ -31,8 +34,7 @@
                    </div>
                    <div class="row">
                     <div class="input-field col s6">
-                        <h:inputText value="#{login.usuario}" />
-                       
+                        <h:inputText value="#{login.usuario}" />                       
                       <label for="usuario">Usuário</label>
                     </div>
                     <div class="input-field col s6">

@@ -11,13 +11,13 @@
             <ui:define name="menuList">
                     <h:form>
                         <li>
-                          <a>Cadastrar Promoção</a>  
+                            <a jsf:outcome="cadastroPromocao"> Cadastrar Promoção </a>  
                         </li>
                         <li>
-                            <a>Listar Promoções</a>
+                            <h:commandLink action="#{listaPromocao.listaPromocao(1, login.hotel.id)}"> Listar Promoções </h:commandLink>
                         </li>
                         <li>
-                            <a jsf:outcome="index">Sair</a>
+                            <h:commandLink action="#{login.logout()}"> Sair </h:commandLink>
                         </li>
                     </h:form>
             </ui:define>
